@@ -1,0 +1,15 @@
+node_modules/
+/data/
+/uploads/
+/backups/
+/.env
+.env.*
+!.env.example
+*.log
+npm-debug.log*
+*.sqlite
+*.sqlite-*
+.DS_Store
+Thumbs.db
+/-
+tailwind.generated.css

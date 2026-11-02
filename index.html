@@ -1,0 +1,1207 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AdminFlow - Gestion Administrative Enseignement Supérieur</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css" />
+        <link rel="stylesheet" href="tailwind.generated.css" />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body class="bg-[#edf5ff] font-sans text-slate-800 antialiased min-h-screen flex flex-col">
+        <section id="auth-screen" class="auth-screen fixed inset-0 z-[100] flex">
+            <div class="auth-login-section">
+                <div class="auth-form-container">
+                    <div id="setup-panel" class="hidden">
+                        <p class="auth-eyebrow">Configuration initiale</p>
+                        <h2 class="auth-heading">Créer le compte administrateur</h2>
+                        <p class="auth-description">
+                            Cette étape n’apparaît qu’au premier démarrage.
+                        </p>
+                        <form id="setup-form" class="auth-form">
+                            <label class="auth-field">
+                                <span>Nom complet</span>
+                                <input name="name" required maxlength="100" autocomplete="name" placeholder="Ex. Marie Ilunga" class="auth-input" />
+                            </label>
+                            <label class="auth-field">
+                                <span>Adresse e-mail</span>
+                                <input name="email" type="email" required maxlength="254" autocomplete="email" placeholder="nom@institution.cg" class="auth-input" />
+                            </label>
+                            <label class="auth-field">
+                                <span>Mot de passe</span>
+                                <input
+                                    name="password"
+                                    type="password"
+                                    required
+                                    minlength="12"
+                                    maxlength="72"
+                                    autocomplete="new-password"
+                                    placeholder="12 caractères minimum"
+                                    class="auth-input"
+                                />
+                            </label>
+                            <button class="auth-submit">
+                                <span>Créer le compte</span>
+                                <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                            </button>
+                        </form>
+                    </div>
+                    <div id="login-panel" class="hidden">
+                        <p class="auth-eyebrow">Espace administratif · IPTO</p>
+                        <h2 class="auth-heading">Bienvenue</h2>
+                        <p class="auth-description">
+                            Connectez-vous avec votre compte institutionnel.
+                        </p>
+                        <form id="login-form" class="auth-form">
+                            <label class="auth-field">
+                                <span>Adresse e-mail</span>
+                                <input
+                                    name="email"
+                                    type="email"
+                                    required
+                                    autocomplete="username"
+                                    placeholder="nom@institution.cg"
+                                    class="auth-input"
+                                />
+                            </label>
+                            <label class="auth-field">
+                                <span>Mot de passe</span>
+                                <input
+                                    name="password"
+                                    type="password"
+                                    required
+                                    maxlength="72"
+                                    autocomplete="current-password"
+                                    placeholder="Saisissez votre mot de passe"
+                                    class="auth-input"
+                                />
+                            </label>
+                            <button class="auth-submit">
+                                <span>Se connecter</span>
+                                <i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i>
+                            </button>
+                        </form>
+                        <p class="auth-footnote">Accès réservé au personnel de l’Institut.</p>
+                    </div>
+                    <p
+                        id="auth-error"
+                        class="hidden mt-4 text-sm text-red-700 bg-red-50 rounded-lg p-3"
+                        role="alert"
+                    ></p>
+                </div>
+            </div>
+            <div class="auth-brand-panel">
+                <div class="auth-brand-content">
+                    <div class="auth-brand-lockup">
+                        <img
+                            src="/logo-ipto.jpg"
+                            alt="Logo de l’Institut Professionnel et Technologique d’Oyo"
+                            class="auth-brand-logo"
+                        />
+                        <span>Institut Professionnel<br />et Technologique d’Oyo</span>
+                    </div>
+                    <p class="auth-brand-kicker">L’excellence en formation</p>
+                    <h1>IPTO</h1>
+                    <p class="auth-brand-caption">Un espace de travail conçu pour faire avancer votre institution.</p>
+                </div>
+            </div>
+        </section>
+
+        <div id="app-root" class="hidden flex flex-1 relative overflow-hidden">
+            <div
+                id="sidebar-overlay"
+                onclick="toggleSidebar()"
+                class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-30 hidden lg:hidden"
+            ></div>
+
+            <aside
+                id="sidebar"
+                class="w-72 bg-[#0B1F4A] text-white flex flex-col justify-between fixed lg:static inset-y-0 left-0 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out shadow-xl"
+            >
+                <div>
+                    <div class="p-5 border-b border-white/10 flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <img
+                                src="/logo-ipto.jpg"
+                                alt="Logo de l’Institut Professionnel et Technologique d’Oyo"
+                                class="w-12 h-12 rounded-xl object-contain bg-white"
+                            />
+                            <div>
+                                <div class="text-2xl font-bold leading-none">IPTO</div>
+                                <div class="text-[10px] uppercase tracking-[0.18em] text-blue-200 mt-1">
+                                    Travailler ensemble
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="toggleSidebar()" class="lg:hidden text-slate-300 hover:text-white">
+                            <i class="fa-solid fa-xmark text-xl"></i>
+                        </button>
+                    </div>
+
+                    <nav class="p-4 space-y-2">
+                        <button
+                            onclick="showTab('dashboard')"
+                            id="nav-dashboard"
+                            class="nav-item w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-white bg-blue-600 font-semibold transition-all group shadow-sm"
+                        >
+                            <i class="fa-solid fa-house w-5 text-center text-blue-100"></i>
+                            <span>Tableau de bord</span>
+                        </button>
+                        <button
+                            onclick="showTab('documents')"
+                            id="nav-documents"
+                            class="nav-item w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-medium transition-all group"
+                        >
+                            <div class="flex items-center space-x-3">
+                                <i class="fa-solid fa-folder-open w-5 text-center"></i>
+                                <span>Documents</span>
+                            </div>
+                            <span
+                                id="badge-doc-count"
+                                class="bg-blue-900/80 text-blue-200 text-xs px-2 py-0.5 rounded-full font-semibold"
+                                >0</span
+                            >
+                        </button>
+                        <button
+                            onclick="showTab('demandes')"
+                            id="nav-demandes"
+                            class="nav-item w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-medium transition-all group"
+                        >
+                            <div class="flex items-center space-x-3">
+                                <i class="fa-solid fa-list-check w-5 text-center"></i>
+                                <span>Demandes</span>
+                            </div>
+                            <span
+                                id="badge-request-count"
+                                class="bg-amber-500/20 text-amber-200 text-xs px-2 py-0.5 rounded-full font-semibold"
+                                >0</span
+                            >
+                        </button>
+                        <button
+                            onclick="showTab('communication')"
+                            id="nav-communication"
+                            class="nav-item w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-medium transition-all group"
+                        >
+                            <i class="fa-solid fa-comments w-5 text-center"></i>
+                            <span>Communication</span>
+                        </button>
+                        <button
+                            onclick="showTab('annonces')"
+                            id="nav-annonces"
+                            class="nav-item w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-medium transition-all group"
+                        >
+                            <i class="fa-solid fa-bullhorn w-5 text-center"></i>
+                            <span>Annonces</span>
+                        </button>
+                        <button
+                            onclick="showTab('notifications')"
+                            id="nav-notifications"
+                            class="nav-item w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-medium transition-all group"
+                        >
+                            <div class="flex items-center space-x-3">
+                                <i class="fa-solid fa-bell w-5 text-center"></i>
+                                <span>Notifications</span>
+                            </div>
+                            <span
+                                id="sidebar-notification-count"
+                                class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold hidden"
+                                >0</span
+                            >
+                        </button>
+                        <button
+                            onclick="showTab('admin')"
+                            id="nav-admin"
+                            class="nav-item w-full flex items-center space-x-3 px-3.5 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-medium transition-all group"
+                        >
+                            <i class="fa-solid fa-gear w-5 text-center"></i>
+                            <span>Paramètres</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <div class="p-4">
+                    <div
+                        class="rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-br from-white/10 to-white/5"
+                    >
+                        <div class="h-32 bg-white flex items-center justify-center p-2">
+                            <img
+                                src="/ipo.jpeg"
+                                alt="Étudiants devant le bâtiment de l’administration"
+                                class="h-full w-full object-cover"
+                            />
+                        </div>
+                        <div class="p-4">
+                            <div class="text-sm font-bold leading-snug">
+                                Institut Professionnel et Technologique d’Oyo
+                            </div>
+                            <div class="text-xs text-blue-100 mt-1">(IPTO)</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="flex-1 flex flex-col min-w-0 overflow-y-auto custom-scrollbar bg-[#edf5ff]">
+                <header
+                    class="bg-[#edf5ff] sticky top-0 z-20 px-5 sm:px-8 py-4 flex items-center justify-between"
+                >
+                    <div class="flex items-center space-x-4 flex-1">
+                        <button
+                            onclick="toggleSidebar()"
+                            class="lg:hidden text-slate-700 hover:text-slate-900 text-xl"
+                        >
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                        <div id="global-search" class="relative flex-1 max-w-xl">
+                            <i
+                                class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                            ></i>
+                            <input
+                                id="global-search-input"
+                                type="search"
+                                role="combobox"
+                                aria-label="Recherche dans la plateforme"
+                                aria-autocomplete="list"
+                                aria-controls="global-search-results"
+                                aria-expanded="false"
+                                autocomplete="off"
+                                placeholder="Rechercher un document, une demande, un message..."
+                                class="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 bg-white/80 shadow-sm focus:outline-none focus:border-blue-500 text-sm"
+                            />
+                            <div
+                                id="global-search-results"
+                                role="listbox"
+                                class="absolute left-0 right-0 top-full mt-2 max-h-96 overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-xl z-30 hidden"
+                            ></div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-4">
+                        <button
+                            onclick="showTab('notifications')"
+                            class="relative p-3 rounded-2xl bg-white shadow-sm border border-slate-200 text-slate-700 hover:bg-slate-50"
+                            aria-label="Notifications"
+                        >
+                            <i class="fa-solid fa-bell text-lg"></i>
+                            <span
+                                id="header-notification-count"
+                                class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full hidden items-center justify-center font-bold"
+                                >0</span
+                            >
+                        </button>
+                        <button
+                            onclick="logout()"
+                            class="p-3 rounded-2xl bg-white shadow-sm border border-slate-200 text-slate-700 hover:text-red-600"
+                            aria-label="Se déconnecter"
+                            title="Se déconnecter"
+                        >
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        </button>
+                        <div
+                            class="flex items-center gap-3 bg-white px-3 py-2 rounded-2xl shadow-sm border border-slate-200"
+                        >
+                            <div
+                                id="user-avatar"
+                                class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-sm"
+                            >
+                                JD
+                            </div>
+                            <div class="text-right hidden sm:block">
+                                <div id="user-display-name" class="font-bold text-slate-800">
+                                    Dr. Jean Dupont
+                                </div>
+                                <div id="user-display-role" class="text-[11px] text-slate-500">
+                                    Directeur Général
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Main Dynamic Container -->
+                <main class="p-4 sm:p-8 flex-1 bg-slate-50">
+                    <!-- 1. TAB: DASHBOARD -->
+                    <div id="tab-dashboard" class="tab-content space-y-6">
+                        <div
+                            class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                        >
+                            <div>
+                                <h1 class="text-3xl font-extrabold tracking-tight text-slate-800">
+                                    Bonjour, <span id="dash-welcome-name">Dr. Jean Dupont</span>
+                                </h1>
+                                <p class="text-sm text-slate-500 mt-2">
+                                    Voici un aperçu de votre activité sur AdminFlow
+                                </p>
+                            </div>
+                            <div
+                                class="bg-white border border-slate-200 shadow-sm rounded-2xl px-4 py-3 flex items-center gap-3"
+                            >
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center"
+                                >
+                                    <i class="fa-regular fa-calendar-days"></i>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] uppercase tracking-[0.2em] text-slate-400">
+                                        Date
+                                    </div>
+                                    <div id="today-date" class="font-bold text-slate-700"></div>
+                                    <div id="today-time" class="text-xs text-slate-500"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3 pb-2">
+                            <div
+                                id="role-banner"
+                                class="inline-flex items-center gap-2 bg-blue-50 text-blue-800 border border-blue-100 px-3 py-2 rounded-xl text-xs font-semibold"
+                            >
+                                <i class="fa-solid fa-user-shield"></i><span id="role-banner-name"></span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                            <div
+                                class="bg-gradient-to-br from-blue-600 via-blue-500 to-blue-600 rounded-2xl p-5 text-white shadow-lg"
+                            >
+                                <div class="flex items-center justify-between">
+                                    <div class="text-[11px] uppercase tracking-[0.18em] text-blue-100">
+                                        Total Documents
+                                    </div>
+                                    <div
+                                        class="w-11 h-11 rounded-xl bg-white/15 flex items-center justify-center"
+                                    >
+                                        <i class="fa-solid fa-folder-open"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-5 flex items-end justify-between">
+                                    <span id="stat-total-docs" class="text-4xl font-extrabold leading-none"
+                                        >128</span
+                                    >
+                                    <span class="text-xs font-semibold bg-white/10 px-2 py-1 rounded-full"
+                                        >À jour</span
+                                    >
+                                </div>
+                            </div>
+
+                            <div
+                                class="bg-gradient-to-br from-emerald-500 to-green-500 rounded-2xl p-5 text-white shadow-lg"
+                            >
+                                <div class="flex items-center justify-between">
+                                    <div class="text-[11px] uppercase tracking-[0.18em] text-emerald-100">
+                                        Demandes Reçues
+                                    </div>
+                                    <div
+                                        class="w-11 h-11 rounded-xl bg-white/15 flex items-center justify-center"
+                                    >
+                                        <i class="fa-solid fa-paper-plane"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-5 flex items-end justify-between">
+                                    <span
+                                        id="stat-requests-received"
+                                        class="text-4xl font-extrabold leading-none"
+                                        >0</span
+                                    >
+                                    <span class="text-xs font-semibold bg-white/10 px-2 py-1 rounded-full"
+                                        >Reçues</span
+                                    >
+                                </div>
+                            </div>
+
+                            <div
+                                class="bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl p-5 text-white shadow-lg"
+                            >
+                                <div class="flex items-center justify-between">
+                                    <div class="text-[11px] uppercase tracking-[0.18em] text-amber-100">
+                                        Demandes Envoyées
+                                    </div>
+                                    <div
+                                        class="w-11 h-11 rounded-xl bg-white/15 flex items-center justify-center"
+                                    >
+                                        <i class="fa-solid fa-paper-plane"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-5 flex items-end justify-between">
+                                    <span id="stat-requests-sent" class="text-4xl font-extrabold leading-none"
+                                        >0</span
+                                    >
+                                    <span class="text-xs font-semibold bg-white/10 px-2 py-1 rounded-full"
+                                        >Envoyées</span
+                                    >
+                                </div>
+                            </div>
+
+                            <div
+                                class="bg-gradient-to-br from-violet-500 to-purple-500 rounded-2xl p-5 text-white shadow-lg"
+                            >
+                                <div class="flex items-center justify-between">
+                                    <div class="text-[11px] uppercase tracking-[0.18em] text-violet-100">
+                                        En attente
+                                    </div>
+                                    <div
+                                        class="w-11 h-11 rounded-xl bg-white/15 flex items-center justify-center"
+                                    >
+                                        <i class="fa-solid fa-clock"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-5 flex items-end justify-between">
+                                    <span id="stat-pending-docs" class="text-4xl font-extrabold leading-none"
+                                        >8</span
+                                    >
+                                    <span class="text-xs font-semibold bg-white/10 px-2 py-1 rounded-full"
+                                        >À traiter</span
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 xl:grid-cols-[1.25fr_1.2fr_0.85fr] gap-6">
+                            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                                <div class="flex items-center justify-between mb-5">
+                                    <h3 class="font-bold text-slate-800 text-xl">Activité récente</h3>
+                                    <button
+                                        onclick="showTab('documents')"
+                                        class="text-sm font-semibold text-blue-600"
+                                    >
+                                        Voir tout →
+                                    </button>
+                                </div>
+                                <div id="recent-activity" class="space-y-4"></div>
+                            </div>
+
+                            <div class="space-y-6">
+                                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <h3 class="font-bold text-slate-800 text-xl">État des documents</h3>
+                                        <button
+                                            onclick="showTab('documents')"
+                                            class="text-sm font-semibold text-blue-600"
+                                        >
+                                            Voir tout →
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center justify-center gap-6">
+                                        <div
+                                            class="relative w-40 h-40 rounded-full bg-[conic-gradient(#34d399_0_72%,#fbbf24_72%_86%,#f97316_86%_94%,#ef4444_94%_100%)] flex items-center justify-center"
+                                        >
+                                            <div
+                                                class="w-24 h-24 rounded-full bg-white flex items-center justify-center text-center"
+                                            >
+                                                <div>
+                                                    <div
+                                                        id="chart-total-docs"
+                                                        class="text-3xl font-extrabold text-slate-800"
+                                                    >
+                                                        0
+                                                    </div>
+                                                    <div
+                                                        class="text-[10px] uppercase tracking-[0.2em] text-slate-400"
+                                                    >
+                                                        Docs
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="document-status-summary" class="space-y-3 text-sm"></div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <h3 class="font-bold text-slate-800 text-xl">Mes demandes</h3>
+                                        <button
+                                            onclick="showTab('demandes')"
+                                            class="text-sm font-semibold text-blue-600"
+                                        >
+                                            Voir tout →
+                                        </button>
+                                    </div>
+                                    <div id="recent-requests" class="space-y-3 text-sm"></div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-6">
+                                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <h3 class="font-bold text-slate-800 text-xl">Notifications</h3>
+                                        <button
+                                            onclick="showTab('notifications')"
+                                            class="text-sm font-semibold text-blue-600"
+                                        >
+                                            Voir tout →
+                                        </button>
+                                    </div>
+                                    <div id="dashboard-notifications" class="space-y-3 text-sm"></div>
+                                </div>
+
+                                <div
+                                    class="bg-gradient-to-br from-indigo-900 via-blue-800 to-blue-700 rounded-2xl p-4 text-white shadow-xl overflow-hidden"
+                                >
+                                    <div class="rounded-2xl overflow-hidden border border-white/10">
+                                        <img
+                                            src="/batiment-principal.jpg"
+                                            alt="Bâtiment principal de l’administration"
+                                            class="w-full h-28 object-cover"
+                                        />
+                                    </div>
+                                    <div class="mt-4">
+                                        <div class="text-2xl font-bold leading-tight">
+                                            Une administration digitale pour une gestion plus efficace
+                                        </div>
+                                        <button
+                                            class="mt-4 bg-white text-blue-700 px-4 py-2 rounded-xl font-bold text-sm"
+                                        >
+                                            En savoir plus →
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="bg-white rounded-2xl border border-slate-200 shadow-sm px-5 py-4 flex items-center justify-between gap-4"
+                        >
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center"
+                                >
+                                    <i class="fa-solid fa-lightbulb"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-slate-800">Astuce du jour</div>
+                                    <div class="text-sm text-slate-600">
+                                        Vous pouvez suivre l’état de vos documents en temps réel depuis le
+                                        tableau de bord.
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="text-slate-400 hover:text-slate-600 text-xl" aria-label="Fermer">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 2. TAB: DOCUMENTS & TRANSMISSION -->
+                    <div id="tab-documents" class="tab-content space-y-6 hidden">
+                        <!-- Section Header -->
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
+                                <h2 class="text-xl font-bold text-slate-800">
+                                    Gestion Documentaire & Circuit de Transmission
+                                </h2>
+                                <p class="text-xs text-slate-500">
+                                    Consultez, transmettez et suivez l'historique de validation des actes
+                                    administratifs.
+                                </p>
+                            </div>
+                            <button
+                                onclick="openModal('modal-new-doc')"
+                                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg transition-all shadow-sm flex items-center gap-2 self-start sm:self-auto"
+                            >
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Déposer / Transmettre un acte
+                            </button>
+                        </div>
+
+                        <!-- Filters & Search Bar -->
+                        <div
+                            class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3 text-xs"
+                        >
+                            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                                <span class="font-semibold text-slate-500 mr-1">Filtrer par :</span>
+                                <select
+                                    id="filter-category"
+                                    onchange="applyDocFilters()"
+                                    class="bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-slate-700 focus:outline-none focus:border-blue-500"
+                                >
+                                    <option value="all">Toutes les catégories</option>
+                                    <option value="Note de service">Notes de service</option>
+                                    <option value="Procès-Verbal">Procès-Verbaux</option>
+                                    <option value="Rapport">Rapports Académiques</option>
+                                    <option value="Attestation">Attestations & Relevés</option>
+                                </select>
+                                <select
+                                    id="filter-status"
+                                    onchange="applyDocFilters()"
+                                    class="bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-slate-700 focus:outline-none focus:border-blue-500"
+                                >
+                                    <option value="all">Tous les statuts</option>
+                                    <option value="En cours">En cours de validation</option>
+                                    <option value="Validé">Validé / Signé</option>
+                                    <option value="Rejeté">Rejeté / À réviser</option>
+                                </select>
+                            </div>
+                            <div class="relative w-full md:w-64">
+                                <i
+                                    class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                                ></i>
+                                <input
+                                    type="text"
+                                    id="doc-search-input"
+                                    onkeyup="applyDocFilters()"
+                                    placeholder="Recherche rapide par mot-clé..."
+                                    class="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Documents Main Table -->
+                        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr
+                                            class="bg-slate-50 border-b border-slate-200 text-[11px] uppercase tracking-wider text-slate-500 font-bold"
+                                        >
+                                            <th class="p-4">Réf & Intitulé</th>
+                                            <th class="p-4">Catégorie</th>
+                                            <th class="p-4">Émetteur -> Destinataire</th>
+                                            <th class="p-4">Date dépôt</th>
+                                            <th class="p-4">Statut actuel</th>
+                                            <th class="p-4 text-right">Actions / Transmettre</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody
+                                        id="table-documents-body"
+                                        class="divide-y divide-slate-100 text-xs"
+                                    >
+                                        <!-- Injected JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. TAB: DEMANDES ADMINISTRATIVES -->
+                    <div id="tab-demandes" class="tab-content space-y-6 hidden">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h2 class="text-xl font-bold text-slate-800">
+                                    Demandes Administratives & Relevés
+                                </h2>
+                                <p class="text-xs text-slate-500">
+                                    Suivi des requêtes des étudiants et enseignants.
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button
+                                    id="clear-requests-button"
+                                    type="button"
+                                    onclick="clearRequests()"
+                                    class="hidden text-slate-500 hover:text-rose-600 text-xs px-3 py-2.5"
+                                    title="Retirer toutes les demandes de ma liste"
+                                >
+                                    <i class="fa-solid fa-trash-can mr-1"></i> Tout retirer
+                                </button>
+                                <button
+                                    onclick="openModal('modal-new-demande')"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg transition-all shadow-sm"
+                                >
+                                    <i class="fa-solid fa-plus mr-1.5"></i> Nouvelle requête
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                            <table class="w-full text-left text-xs">
+                                <thead
+                                    class="bg-slate-50 text-slate-500 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200"
+                                >
+                                    <tr>
+                                        <th class="p-4">Code demande</th>
+                                        <th class="p-4">Demandeur</th>
+                                        <th class="p-4">Objet de la demande</th>
+                                        <th class="p-4">Priorité</th>
+                                        <th class="p-4">Statut</th>
+                                        <th class="p-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-demandes-body" class="divide-y divide-slate-100">
+                                    <!-- Injected JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 4. TAB: COMMUNICATION -->
+                    <div id="tab-communication" class="tab-content space-y-6 hidden">
+                        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                            <div class="p-5 border-b border-slate-100 flex items-start justify-between gap-3">
+                                <div>
+                                    <h2 class="text-xl font-bold text-slate-800">Messagerie inter-services</h2>
+                                    <p class="text-sm text-slate-500 mt-1">
+                                        Les messages retirés de votre boîte restent visibles par les autres destinataires.
+                                    </p>
+                                </div>
+                                <button
+                                    id="clear-messages-button"
+                                    type="button"
+                                    onclick="clearMessages()"
+                                    class="hidden shrink-0 text-slate-500 hover:text-rose-600 text-xs px-2 py-1"
+                                    title="Retirer tous les messages de ma boîte"
+                                >
+                                    <i class="fa-solid fa-trash-can mr-1"></i> Tout retirer
+                                </button>
+                            </div>
+                            <div id="messages-list" class="p-5 space-y-3 max-h-[28rem] overflow-y-auto"></div>
+                            <form
+                                id="message-form"
+                                class="p-5 border-t border-slate-100 grid gap-3 sm:grid-cols-[12rem_1fr_auto]"
+                            >
+                                <select
+                                    name="receiverRole"
+                                    required
+                                    class="border rounded-lg px-3 py-2 text-sm"
+                                >
+                                    <option value="dg">DG</option>
+                                    <option value="de">DE</option>
+                                    <option value="scolarite">CSS</option>
+                                    <option value="admin">Chef du système informatique</option>
+                                    <option value="secretariat">SG</option>
+                                </select>
+                                <textarea
+                                    name="body"
+                                    required
+                                    maxlength="3000"
+                                    rows="2"
+                                    placeholder="Écrire un message..."
+                                    class="border rounded-lg px-3 py-2 text-sm"
+                                ></textarea>
+                                <button
+                                    class="self-end bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-semibold"
+                                >
+                                    <i class="fa-solid fa-paper-plane mr-1"></i>Envoyer
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- 5. TAB: ANNONCES -->
+                    <div id="tab-annonces" class="tab-content space-y-6 hidden">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-xl font-bold text-slate-800">Annonces & Notes d'Information</h2>
+                            <div class="flex items-center gap-2">
+                                <button
+                                    id="clear-announcements-button"
+                                    type="button"
+                                    onclick="clearAnnouncements()"
+                                    class="hidden text-slate-500 hover:text-rose-600 text-xs px-2 py-1"
+                                    title="Retirer toutes les annonces de ma liste"
+                                >
+                                    <i class="fa-solid fa-trash-can mr-1"></i> Tout retirer
+                                </button>
+                                <button
+                                    id="publish-announcement-button"
+                                    onclick="toggleAnnouncementForm()"
+                                    class="bg-blue-600 text-white text-xs px-3 py-2 rounded-lg font-semibold"
+                                >
+                                    <i class="fa-solid fa-bullhorn mr-1"></i> Publier une annonce
+                                </button>
+                            </div>
+                        </div>
+
+                        <form
+                            id="announcement-form"
+                            class="hidden bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3"
+                        >
+                            <input
+                                name="title"
+                                required
+                                maxlength="180"
+                                placeholder="Titre de l’annonce"
+                                class="w-full border rounded-lg px-3 py-2 text-sm"
+                            />
+                            <textarea
+                                name="body"
+                                required
+                                maxlength="3000"
+                                rows="4"
+                                placeholder="Contenu de l’annonce"
+                                class="w-full border rounded-lg px-3 py-2 text-sm"
+                            ></textarea>
+                            <div class="flex justify-between items-center">
+                                <select name="priority" class="border rounded-lg px-3 py-2 text-sm">
+                                    <option value="GÉNÉRAL">Général</option>
+                                    <option value="URGENT">Urgent</option>
+                                </select>
+                                <button
+                                    class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-semibold"
+                                >
+                                    Publier
+                                </button>
+                            </div>
+                        </form>
+                        <div id="announcements-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                    </div>
+
+                    <!-- 6. TAB: NOTIFICATIONS -->
+                    <div id="tab-notifications" class="tab-content space-y-4 hidden">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div>
+                                <h2 class="text-xl font-bold text-slate-800">Centre de notifications</h2>
+                                <p class="text-sm text-slate-500">
+                                    Les notifications sont enregistrées et mises à jour en temps réel.
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <button
+                                    id="clear-notifications-button"
+                                    type="button"
+                                    onclick="clearNotifications()"
+                                    class="hidden text-slate-500 hover:text-rose-600 text-xs px-2 py-1"
+                                    title="Supprimer toutes mes notifications"
+                                >
+                                    <i class="fa-solid fa-trash-can mr-1"></i> Tout supprimer
+                                </button>
+                                <span
+                                    id="desktop-notification-status"
+                                    class="text-xs text-slate-500"
+                                    aria-live="polite"
+                                ></span>
+                                <button
+                                    id="enable-desktop-notifications"
+                                    type="button"
+                                    onclick="enableDesktopNotifications()"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2 text-xs font-semibold"
+                                >
+                                    Activer les alertes de bureau
+                                </button>
+                            </div>
+                        </div>
+                        <div id="notifications-list" class="space-y-3">
+                            <!-- Dynamic list -->
+                        </div>
+                    </div>
+
+                    <!-- 7. TAB: ADMINISTRATION -->
+                    <div id="tab-admin" class="tab-content space-y-6 hidden">
+                        <h2 class="text-xl font-bold text-slate-800">
+                            Paramètres du compte et de la plateforme
+                        </h2>
+                        <form
+                            id="password-form"
+                            class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3"
+                        >
+                            <h3 class="font-bold text-sm text-slate-800">Changer mon mot de passe</h3>
+                            <div class="grid gap-3 md:grid-cols-2">
+                                <input
+                                    name="currentPassword"
+                                    type="password"
+                                    required
+                                    maxlength="72"
+                                    autocomplete="current-password"
+                                    placeholder="Mot de passe actuel"
+                                    class="border rounded-lg px-3 py-2 text-sm"
+                                />
+                                <input
+                                    name="newPassword"
+                                    type="password"
+                                    required
+                                    minlength="12"
+                                    maxlength="72"
+                                    autocomplete="new-password"
+                                    placeholder="Nouveau mot de passe (12 caractères min.)"
+                                    class="border rounded-lg px-3 py-2 text-sm"
+                                />
+                            </div>
+                            <button
+                                class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-semibold"
+                            >
+                                Mettre à jour
+                            </button>
+                        </form>
+                        <h2 class="admin-only text-xl font-bold text-slate-800">
+                            Gestion des comptes et des rôles
+                        </h2>
+                        <form
+                            id="user-form"
+                            class="admin-only bg-white p-5 rounded-xl border border-slate-200 shadow-sm grid gap-3 md:grid-cols-2"
+                        >
+                            <input
+                                name="name"
+                                required
+                                maxlength="100"
+                                placeholder="Nom complet"
+                                class="border rounded-lg px-3 py-2 text-sm"
+                            />
+                            <input
+                                name="email"
+                                type="email"
+                                required
+                                maxlength="254"
+                                placeholder="Adresse e-mail"
+                                class="border rounded-lg px-3 py-2 text-sm"
+                            />
+                            <input
+                                name="password"
+                                type="password"
+                                required
+                                minlength="12"
+                                maxlength="72"
+                                autocomplete="new-password"
+                                placeholder="Mot de passe temporaire (12 caractères min.)"
+                                class="border rounded-lg px-3 py-2 text-sm"
+                            />
+                            <select name="role" required class="border rounded-lg px-3 py-2 text-sm">
+                                <option value="" selected disabled>Choisir un rôle disponible</option>
+                                <option value="dg">Directeur Général (DG)</option>
+                                <option value="de">Directeur des Études (DE)</option>
+                                <option value="scolarite">Chef de Scolarité (CSS)</option>
+                                <option value="admin">Chef du système informatique</option>
+                                <option value="secretariat">Secrétariat Général (SG)</option>
+                            </select>
+                            <p class="text-xs text-slate-500 md:col-span-2">
+                                Un seul compte actif peut occuper chaque rôle. Désactivez le compte actuel avant son remplacement.
+                            </p>
+                            <p
+                                id="role-conflict-notice"
+                                class="hidden rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800 md:col-span-2"
+                                role="alert"
+                            ></p>
+                            <button
+                                class="md:col-span-2 justify-self-end bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-semibold"
+                            >
+                                Créer le compte
+                            </button>
+                        </form>
+                        <div
+                            class="admin-only bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4"
+                        >
+                            <h3 class="font-bold text-sm text-slate-800">Comptes existants</h3>
+                            <div id="users-list" class="divide-y divide-slate-100 text-xs"></div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+
+        <!-- MODAL 1: DÉPOSER / TRANSMETTRE UN DOCUMENT -->
+        <div
+            id="modal-new-doc"
+            class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden"
+        >
+            <div
+                class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 space-y-4 transform transition-all"
+            >
+                <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                    <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-file-circle-plus text-blue-600"></i>
+                        Transmettre un document
+                    </h3>
+                    <button onclick="closeModal('modal-new-doc')" class="text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <form id="form-new-doc" class="space-y-3 text-xs">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Intitulé du document *</label>
+                        <input
+                            type="text"
+                            id="doc-title"
+                            required
+                            placeholder="ex: PV de Délibération Master 2 Informatique"
+                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500"
+                        />
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Catégorie *</label>
+                            <select
+                                id="doc-category"
+                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500"
+                            >
+                                <option value="Note de service">Note de service</option>
+                                <option value="Procès-Verbal">Procès-Verbal</option>
+                                <option value="Rapport">Rapport Académique</option>
+                                <option value="Attestation">Attestation / Relevé</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Transmettre à *</label>
+                            <select
+                                id="doc-receiver"
+                                required
+                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500"
+                            >
+                                <option value="dg">Directeur Général (DG)</option>
+                                <option value="de">Directeur des Études (DE)</option>
+                                <option value="scolarite">Chef de Scolarité (CSS)</option>
+                                <option value="admin">Chef du système informatique</option>
+                                <option value="secretariat">Secrétariat Général (SG)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1"
+                            >Fichier joint (PDF, DOCX) *</label
+                        >
+                        <label
+                            id="file-dropzone"
+                            for="file-input"
+                            class="block border-2 border-dashed border-slate-300 rounded-lg p-4 text-center hover:bg-slate-50 transition-all cursor-pointer"
+                        >
+                            <i class="fa-solid fa-cloud-arrow-up text-2xl text-blue-500 mb-1"></i>
+                            <p class="text-slate-600 font-medium">
+                                Glissez un fichier ou cliquez pour parcourir
+                            </p>
+                            <p class="text-[10px] text-slate-400">PDF, DOCX jusqu'à 15MB</p>
+                            <input
+                                type="file"
+                                class="hidden"
+                                id="file-input"
+                                name="attachment"
+                                required
+                                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                            />
+                            <span id="file-chosen-name" class="block text-blue-600 font-bold mt-2"></span>
+                        </label>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1"
+                            >Observations / Consignes</label
+                        >
+                        <textarea
+                            id="doc-notes"
+                            rows="2"
+                            placeholder="Précisez les instructions de signature ou de vérification..."
+                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500"
+                        ></textarea>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 flex justify-end space-x-2">
+                        <button
+                            type="button"
+                            onclick="closeModal('modal-new-doc')"
+                            class="px-4 py-2 rounded-lg bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200"
+                        >
+                            Annuler
+                        </button>
+                        <button
+                            type="submit"
+                            class="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700"
+                        >
+                            Envoyer le fichier
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL 2: HISTORIQUE DE TRANSMISSION -->
+        <div
+            id="modal-history"
+            class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden"
+        >
+            <div
+                class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 space-y-4"
+            >
+                <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                    <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-timeline text-blue-600"></i>
+                        Circuit de validation du document
+                    </h3>
+                    <button onclick="closeModal('modal-history')" class="text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <div id="history-content" class="space-y-4 text-xs py-2">
+                    <!-- Dynamically generated timeline -->
+                </div>
+
+                <div class="pt-3 border-t border-slate-100 flex justify-end">
+                    <button
+                        onclick="closeModal('modal-history')"
+                        class="px-4 py-2 rounded-lg bg-slate-800 text-white font-semibold hover:bg-slate-700"
+                    >
+                        Fermer
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL 3: NOUVELLE DEMANDE -->
+        <div
+            id="modal-new-demande"
+            class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden"
+        >
+            <div
+                class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4"
+            >
+                <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                    <h3 class="font-bold text-slate-800 text-base">Nouvelle Demande Administrative</h3>
+                    <button
+                        onclick="closeModal('modal-new-demande')"
+                        class="text-slate-400 hover:text-slate-600"
+                    >
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+                <form id="form-new-demande" class="space-y-3 text-xs">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Demandeur</label>
+                        <p
+                            id="demande-requester-name"
+                            class="w-full rounded-lg bg-slate-50 px-3 py-2.5 text-sm text-slate-700"
+                        ></p>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Objet de la requête</label>
+                        <input
+                            type="text"
+                            id="demande-object"
+                            required
+                            placeholder="ex: Demande de duplicata de relevé"
+                            class="w-full px-3 py-2 border rounded-lg"
+                        />
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Priorité</label>
+                        <select id="demande-priority" class="w-full px-3 py-2 border rounded-lg">
+                            <option value="Normal">Normal</option>
+                            <option value="Important">Important</option>
+                            <option value="Urgent">Urgent</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Transmettre au service</label>
+                        <select id="demande-receiver" required class="w-full px-3 py-2 border rounded-lg">
+                            <option value="scolarite">Chef de Scolarité (CSS)</option>
+                            <option value="dg">DG</option>
+                            <option value="de">DE</option>
+                            <option value="admin">Chef du système informatique</option>
+                            <option value="secretariat">SG</option>
+                        </select>
+                    </div>
+                    <div class="pt-2 flex justify-end space-x-2">
+                        <button
+                            type="button"
+                            onclick="closeModal('modal-new-demande')"
+                            class="px-4 py-2 rounded bg-slate-100"
+                        >
+                            Annuler
+                        </button>
+                        <button type="submit" class="px-4 py-2 rounded bg-blue-600 text-white font-bold">
+                            Créer la demande
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Toast Notifications Container -->
+        <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+
+        <script src="script.js"></script>
+    </body>
+</html>

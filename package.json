@@ -1,0 +1,27 @@
+{
+  "name": "adminflow",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Plateforme administrative avec authentification, messagerie et documents",
+  "main": "server.js",
+  "scripts": {
+    "build:css": "tailwindcss -i tailwind.input.css -o tailwind.generated.css --minify",
+    "start": "npm run build:css && node server.js",
+    "check": "node --check server.js && node --check script.js",
+    "verify": "npm run check && npm run build:css",
+    "backup": "node scripts/backup.js",
+    "backup:verify": "node scripts/backup.js --verify"
+  },
+  "engines": {
+    "node": ">=22.5"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "bcryptjs": "^3.0.2",
+    "express": "^5.1.0",
+    "multer": "^2.0.2"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}
